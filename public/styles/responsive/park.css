@@ -1,0 +1,40 @@
+@media screen and (max-width: 800px) {
+    .welcome-area h1 {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 520px) {
+    .welcome-area h1 {
+        font-size: 1.5rem;
+        width: 10rem;
+        text-align: center;
+    }
+
+    .main-content h1,
+    .main-content p {
+        width: 20rem;
+    }
+    
+    .main-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .main-content p {
+        font-size: 1rem;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .main-content h1,
+    .main-content p {
+        width: 15rem;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .main-content h1,
+    .main-content p {
+        width: 10rem;
+    }
+}

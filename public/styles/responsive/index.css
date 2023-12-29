@@ -1,0 +1,68 @@
+    .welcomeSection iframe {
+        width: 90% !important;
+    }
+ 
+    @media screen and (max-width: 1570px) {
+        .line-1,
+        .line-2 {
+            margin: 5rem 10rem 0rem 10rem;
+        }
+    }
+
+    @media screen and (max-width: 1250px) {
+        .line-1,
+        .line-2 {
+            margin: 5rem 7rem 0rem 7rem;
+        }
+    }
+
+    @media screen and (max-width: 1150px) {
+        .line-1,
+        .line-2 {
+            margin: 5rem 5rem 0rem 5rem;
+        }
+    }
+
+    @media screen and (max-width: 1075px) {
+        .line-1,
+        .line-2,
+        .line-1-left,
+        .line-2-right {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            margin: 1rem;
+        }
+    }
+
+    @media screen and (max-width: 900px) {
+        .slideshow span {
+            font-size: 2rem;
+        }
+
+        .logo {
+            width: 5rem;
+        }
+
+
+        .dealOffers h1 {
+            font-size: 1.8rem;
+        }
+
+        .dealOffers p {
+            font-size: 1rem;
+        }
+
+        .dealOffers h1,
+        .dealOffers p {
+            width: 100%;
+            text-align: center;
+        }
+    }
+
+    @media screen and (max-width: 850px) {
+        .welcomeVideo {
+            height: 15rem;
+        }
+    }

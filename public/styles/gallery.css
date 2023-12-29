@@ -1,0 +1,17 @@
+.main-heading {
+    text-align: center;
+}
+
+.image-container {
+    margin-top: 10rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+    justify-items: center;
+}
+
+.image {
+    width: 80%;
+    height: 80%;
+    object-fit: cover;
+}

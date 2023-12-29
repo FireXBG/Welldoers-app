@@ -1,0 +1,49 @@
+nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 5rem 5rem 5rem;
+    transition: 200ms;
+}
+
+nav img {
+    width: 5rem;
+}
+
+nav img:hover {
+    filter: opacity(80%);
+}
+
+.navLinks {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+    padding-left: 1rem;
+}
+
+.navLinks a {
+    color: #606060;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: 500ms;
+}
+
+.navLinks a:hover {
+    color: #222222;
+}
+
+.mobileMenuButton {
+    display: none;
+}
+
+.mobileMenuCloseButton {
+    width: 2rem;
+    filter: invert(1) brightness(1);
+    display: none; 
+}
+
+.menuHolder {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

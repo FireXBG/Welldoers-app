@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/footer.css">
+    <link rel="stylesheet" href="/styles/global.css">
+    <link rel="stylesheet" href="/styles/responsive/footer.css">
+    <link rel="stylesheet" href="/styles/loadingScreen.css">
+    <link rel="stylesheet" href="/styles/nav.css">
+    <link rel="stylesheet" href="/styles/responsive/nav.css">
+    <link rel="stylesheet" href="/styles/privacy.css">
+    <link rel="shortcut icon" href="/img/logo.png"/>
+    <title>Политика за поверителност - Welldoers</title>
+</head>
+<body>
+    <%- include('partials/loading-screen') %>
+
+    <%- include('partials/header') %>
+    <img class="openButton" src="/img/menu.png" alt="open menu button">
+    <div class="mobileMenu">
+        <img class="closeButton" src="/img/clear.png" alt="close menu button">
+        <div class="links">
+            <a href="/park.html">Паркът</a>
+            <a href="/prices.html">Цени</a>
+            <a href="/friends.html">Приятели</a>
+            <a href="/contacts.html">Контакт</a>
+            <a href="#" class="button1">Запази час</a>
+        </div>
+    </div>
+
+    <section class="privacy-content-container">
+        <h1>Политика за поверителност</h1>
+        <p>Нашата уеб страница събира данни за това как потребителите я използват. Google Analytics събира информация за това как потребителите използват уебсайтовете и приложенията. Тази информация може да включва IP адреса на потребителя, типа на браузъра, времето на достъпа, референтния уебсайт и други подобни данни. Ние използваме тези данни, за да предоставяме и подобряваме услугите си, и да анализираме тенденциите. Съхраняваната информация не се предоставя на сайтове, приложения и др. от трети страни, освен ако не сме задължени по закон и/или не сте ни предоставили изрично съгласие за това.</p>
+    </section>
+
+<%- include('partials/footer')  %>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+        <script src="/JS/loadingAnimation.js"></script>
+        <script src="/JS/mobileMenu.js"></script>
+        <script src="/JS/linksTransfer.js"></script> 
+</body>
+</html>
