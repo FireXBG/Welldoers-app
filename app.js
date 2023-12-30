@@ -45,7 +45,6 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
       acc[doc.id] = doc.data().content;
       return acc;
     }, {});
-    console.log("Data:", data); // Add this line for debugging
     res.render(templateName, { data });
   } catch (error) {
     console.error("Error getting documents:", error);

@@ -14,7 +14,7 @@ module.exports = function sendEmail(data) {
   return transporter.sendMail({
     from: process.env.SMTP_ID,
     to: process.env.SMTP_RECIEVER_ID,
-    subject: "New message from contact form",
-    text: `Name: ${firstName}\nLast Name: ${lastName}\nEmail: ${email}\n Message: ${message}`,
+    subject: "Welldoers - Ново съобщение от контактна форма",
+    text: `Име: ${firstName}\nФамилия: ${lastName}\nEmail: ${email}\n Съобщение: ${message}\n\n\n This message was sent from the contact form on welldoers.bg - please do not reply directly to this email.\n\n powered by Carica Web Development`,
   });
 };
