@@ -1,0 +1,47 @@
+@media screen and (max-width: 1400px) {
+    .deal-box img {
+        height: 7rem;
+    }
+}
+
+@media screen and (max-width: 1100px) {
+    .individual,
+    .groups,
+    .deals {
+        gap: 3rem;
+    }
+}
+
+@media screen and (max-width: 850px) {
+    .individual,
+    .groups,
+    .deals {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .deal-box img{
+        height: 8rem;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .price-options {
+        gap: 2rem;
+        flex-direction: column;
+    }
+
+    .welcome-area h1 {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .deal-box img {
+        height: 7rem;
+    }
+
+    .deal-box {
+        width: 10rem;
+    }
+}

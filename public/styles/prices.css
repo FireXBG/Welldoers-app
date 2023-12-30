@@ -1,0 +1,134 @@
+.welcome-area {
+    position: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 3rem;
+}
+
+.welcome-area h1{
+    position: absolute;
+    font-size: 3rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: white;
+}
+
+.welcome-area img {
+    filter: brightness(70%);
+    width: 100%;
+    height: 15rem;
+    object-fit: cover;
+}
+
+.price-options {
+    display: flex;
+    flex-direction: row;
+    gap: 5rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5rem;
+}
+
+.price-options button {
+    border: none;
+    background-color: transparent;
+    font-size: 1rem;
+    text-transform: uppercase;
+    font-weight: 300;
+    cursor: pointer;
+    padding-bottom: 0.5rem;
+}
+
+#individual {
+    border-bottom: solid 0.2rem black;
+}
+
+#individual,
+#groups,
+#deals {
+    transition: 500ms;
+}
+
+.individual,
+.groups,
+.deals {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10rem;
+    margin-top: 5rem;
+    transition: 500ms;
+}
+
+.groups,
+.deals {
+    display: none;
+    opacity: 0;
+}
+
+.deal-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 22rem;
+    width: 22rem;
+    transition: 300ms;
+}
+
+.deal-box img {
+    height: 10rem;
+}
+
+.deal-box:hover {
+    cursor: pointer;
+}
+
+
+
+#priceTag {
+    padding-top: 2rem;
+    font-weight: 300;
+    text-transform: uppercase;
+}
+
+#price {
+    padding-top: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.pricesArea {
+    display: grid;
+    place-items: center;
+}
+
+table {
+    width: 80%;
+    margin-top: 5rem;
+    border-collapse: collapse;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.093);
+    border-radius: 20px;
+}
+
+th {
+    border-bottom: 1px solid #ddd;
+    width: 10rem;
+    height: 5rem;
+    text-align: center;
+    padding: 1rem;
+    /* Corrected */
+    font-size: 1.2rem;
+}
+
+td {
+    width: 10rem;
+    height: 5rem;
+    text-align: center;
+    padding: 1rem;
+    font-size: 1rem;
+}
+
+td:last-child {
+    border-bottom: none;
+}
