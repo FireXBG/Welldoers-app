@@ -2,7 +2,7 @@ const express = require("express");
 const sendEmail = require("./public/JS/sendEmail");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3000;
+const port = 443;
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
