@@ -21,6 +21,12 @@ const {
   listAll,
   getDownloadURL,
 } = require("firebase/storage");
+const {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} = require("firebase/auth");
 
 const firebaseConfig = {
   apiKey: "AIzaSyByQyDLsyd_zm6PEQxtIEI5tWtwzO4Pf7I",
@@ -35,6 +41,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 
 const db = getFirestore();
 const storage = getStorage(firebaseApp);
+const auth = getAuth();
+
+const user = auth.currentUser;
 
 // routes
 
@@ -75,6 +84,10 @@ app.get("/prices", async (req, res) => {
   }
 });
 
+app.get("/privacy", async (req, res) => {
+  await fetchDataAndRenderPage("texts-privacy", "privacy", req, res);
+});
+
 app.get("/gallery", async (req, res) => {
   try {
     // Get a reference to the "images" folder
@@ -101,6 +114,88 @@ app.get("/gallery", async (req, res) => {
 
 app.get("/contacts", async (req, res) => {
   res.render("contacts");
+});
+
+app.get("/friends", async (req, res) => {
+  // first get the friends collection with ordered id by last number sliced.
+
+  const querySnapshot = await getDocs(collection(db, "partners"));
+  const data = querySnapshot.docs.reduce((acc, doc) => {
+    acc[doc.id] = doc.data();
+    return acc;
+  }, {});
+
+  // then get images from storage with ordered id by last number sliced
+
+  const imagesRef = ref(storage, "partners");
+  const imagesList = await listAll(imagesRef);
+
+  const imageUrls = await Promise.all(
+    imagesList.items.map(async (imageRef) => {
+      const url = await getDownloadURL(imageRef);
+      return { imageUrl: url, name: imageRef.name };
+    })
+  );
+
+  // then render the page with the data and the images
+
+  res.render("friends", { data, imageUrls });
+});
+
+// admin panel system
+
+app.get("/admin", (req, res) => {
+  // Check the authentication state
+  const user = auth.currentUser;
+
+  if (user) {
+    // User is authenticated, render the admin page
+    res.render("admin");
+  } else {
+    // User is not authenticated, redirect to login
+    res.redirect("/login");
+  }
+});
+
+app.get("/login", (req, res) => {
+  res.render("login", { error: req.query.error });
+});
+
+app.post("/logout", async (req, res) => {
+  try {
+    // Assuming you are using Firebase authentication
+    await signOut(auth);
+
+    // Redirect to the login page after successful logout
+    res.redirect("/login");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    // Perform the login using Firebase Authentication
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const user = userCredential.user;
+    res.redirect("/admin");
+  } catch (error) {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    console.error(
+      `Login failed. Error code: ${errorCode}, Message: ${errorMessage}`
+    );
+
+    // Redirect back to the login page with an error message
+    res.redirect("/login?error=true");
+  }
 });
 
 // email handle
