@@ -20,3 +20,22 @@
     font-size: 2.4rem;
     width: 100%;
 }
+
+.services {
+    margin-top: 5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    place-items: center;
+}
+
+.service {
+    width: 70%;
+    height: 7rem;
+    display: flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffffcd;
+    box-shadow: 0 0 10px 0px #0000004d;
+    border-radius: 10px;
+};
