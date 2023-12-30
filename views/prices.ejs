@@ -43,13 +43,13 @@
     <section class="pricesArea">
       <table>
         <tr>
-          <th>Услуга</th>
+          <th>Карта</th>
           <th>Цена</th>
         </tr>
         <% Object.keys(data).forEach((key) => { %>
         <tr>
           <td><%= data[key].service %></td>
-          <td><%= data[key].price %> лв.</td>
+          <td><%= data[key].price %></td>
         </tr>
         <% }); %>
       </table>

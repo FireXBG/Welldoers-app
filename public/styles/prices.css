@@ -112,7 +112,13 @@ table {
 }
 
 th {
-    padding-top: 1rem;
+    border-bottom: 1px solid #ddd;
+    width: 10rem;
+    height: 5rem;
+    text-align: center;
+    padding: 1rem;
+    /* Corrected */
+    font-size: 1.2rem;
 }
 
 td {
@@ -120,4 +126,9 @@ td {
     height: 5rem;
     text-align: center;
     padding: 1rem;
+    font-size: 1rem;
+}
+
+td:last-child {
+    border-bottom: none;
 }

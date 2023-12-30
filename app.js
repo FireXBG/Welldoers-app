@@ -1,16 +1,26 @@
 const express = require("express");
+const sendEmail = require("./public/JS/sendEmail");
+const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 // firebase
 
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 const { collection, doc, getDoc, getDocs } = require("firebase/firestore");
-const { get } = require("http");
+const {
+  getStorage,
+  ref,
+  listAll,
+  getDownloadURL,
+} = require("firebase/storage");
 
 const firebaseConfig = {
   apiKey: "AIzaSyByQyDLsyd_zm6PEQxtIEI5tWtwzO4Pf7I",
@@ -24,6 +34,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 // initializeDB
 
 const db = getFirestore();
+const storage = getStorage(firebaseApp);
 
 // routes
 
@@ -48,7 +59,6 @@ app.get("/", async (req, res) => {
 });
 
 app.get("/park", async (req, res) => {
-  const data = await getLandingPageTexts();
   await fetchDataAndRenderPage("texts-park", "park", req, res);
 });
 
@@ -66,29 +76,48 @@ app.get("/prices", async (req, res) => {
   }
 });
 
+app.get("/gallery", async (req, res) => {
+  try {
+    // Get a reference to the "images" folder
+    const imagesRef = ref(storage, "images");
+
+    // Get a list of all items (images) in the "images" folder
+    const imagesList = await listAll(imagesRef);
+
+    // Fetch the download URL for each image
+    const imageUrls = await Promise.all(
+      imagesList.items.map(async (imageRef) => {
+        const url = await getDownloadURL(imageRef);
+        return { imageUrl: url, name: imageRef.name };
+      })
+    );
+
+    // Render your gallery page with the image URLs
+    res.render("gallery", { imageUrls });
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/contacts", async (req, res) => {
+  res.render("contacts");
+});
+
+// email handle
+
+app.post("/send", (req, res) => {
+  sendEmail(req.body)
+    .then((info) => {
+      const currentURL = `${req.protocol}://${req.get("host")}`;
+      res.redirect(`${currentURL}/contacts?success=true`);
+    })
+    .catch((err) => {
+      const currentURL = `${req.protocol}://${req.get("host")}`;
+      res.redirect(`${currentURL}/contacts?success=false`);
+    });
+});
+
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
-
-// dynamic content functions
-
-// get texts for landing page typed.js animation. File name: indexTypingAnimation.js
-async function getLandingPageTexts() {
-  try {
-    const documentId = "typedJStexts"; // Replace with the actual document ID
-    const docRef = doc(db, "texts-index", documentId);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const typedJSData = docSnap.data();
-      const typedJSDataArray = Object.values(typedJSData);
-      return typedJSDataArray;
-    } else {
-      console.log("Document does not exist");
-    }
-  } catch (error) {
-    console.error("Error getting document:", error);
-  }
-}
-
-module.exports = { getLandingPageTexts };
