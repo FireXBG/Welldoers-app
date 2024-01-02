@@ -1,0 +1,56 @@
+.dashboard {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    width: 100vw;
+}
+
+header {
+    height: 100vh;
+    width: 20%;
+    background-color: #121111;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    gap: 3.6rem;
+    color: white;
+}
+
+nav {
+    width: 100%;
+}
+
+.nav-container {
+    background-color: #171616;
+}
+
+.nav-container:hover {
+    background-color: #1e1d1d;
+
+}
+
+.nav-a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    text-decoration: none;
+    padding: 0.5rem;
+    padding-left: 1rem;
+}
+
+.nav-a p {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 400;
+}
+
+.nav-a img {
+    width: 30px;
+    height: 30px;
+}
+
+.nav-a img:first-child {
+    margin-bottom: 0.3rem;
+}

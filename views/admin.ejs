@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Admin Panel - Welldoers</title>
     <link rel="stylesheet" href="/styles/global.css" />
-    <link rel="stylesheet" href="/styles/admin-panel.css/admin.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
   </head>
   <body>
     <form method="POST" action="/logout">
@@ -13,20 +14,11 @@
         <img src="/img/icon-sign-out.svg" alt="" />
       </button>
     </form>
-    <h1 class="welcome-h1">Welcome to Welldoers Admin Panel</h1>
-    <section class="services">
-      <div class="service">
-        <a href="/admin/texts"></a>
-        <h2>Page Texts</h2>
+    <div class="dashboard">
+      <%- include('partials/admin-menu') %>
+      <div class="content">
+        <h1 class="welcome-h1">Welcome to Welldoers Admin Panel</h1>
       </div>
-      <div class="service">
-        <a href="/admin/partners"></a>
-        <h2>Partners</h2>
-      </div>
-      <div class="service">
-        <a href="/admin/gallery"></a>
-        <h2>Gallery</h2>
-      </div>
-    </section>
+    </div>
   </body>
 </html>
