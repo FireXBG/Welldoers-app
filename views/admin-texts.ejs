@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Welldoers</title>
+    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-texts.css" />
+  </head>
+  <body>
+    <form method="POST" action="/logout">
+      <button type="submit" class="logout">
+        <img src="/img/icon-sign-out.svg" alt="" />
+      </button>
+    </form>
+    <div class="dashboard">
+      <%- include('partials/admin-menu') %>
+      <div class="control-panel">
+        <h1>Home page:</h1>
+        <div class="content">
+          <form method="POST" action="/admin-texts/index">
+            <div class="page-container">
+              <label for="home">Section 1 header</label>
+              <textarea name="header1" id="header1" cols="30" rows="10">
+<%= data.index.header1 %></textarea
+              >
+              <label for="home">Section 1 paragraph</label>
+              <textarea name="paragraph1" id="paragraph1" cols="30" rows="10">
+<%= data.index.paragraph1 %></textarea
+              >
+              <label for="home">Line 1 header</label>
+              <textarea
+                name="line1Heading"
+                id="line1Heading"
+                cols="30"
+                rows="10"
+              >
+<%= data.index.line1Heading %></textarea
+              >
+              <label for="home">Line 1 paragraph</label>
+              <textarea
+                name="line1Paragraph"
+                id="line1Paragraph"
+                cols="30"
+                rows="10"
+              >
+<%= data.index.line1Paragraph %></textarea
+              >
+              <label for="home">Line 2 header</label>
+              <textarea
+                name="line2Heading"
+                id="line2Heading"
+                cols="30"
+                rows="10"
+              >
+<%= data.index.line2Heading %></textarea
+              >
+              <label for="home">Line 2 paragraph</label>
+              <textarea
+                name="line2Paragraph"
+                id="line2Paragraph"
+                cols="30"
+                rows="10"
+              >
+<%= data.index.line2Paragraph %></textarea
+              >
+            </div>
+            <button type="submit">Save</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h1>Park page</h1>
+        <div class="content">
+          <form method="POST" action="/admin-texts/park">
+            <div class="page-container">
+              <label for="home">Page moto</label>
+              <textarea name="heading1" id="park-heading1" cols="30" rows="10">
+<%= data.park.heading1 %></textarea
+              >
+              <label for="home">Heading</label>
+              <textarea name="heading2" id="park-heading2" cols="30" rows="10">
+<%= data.park.heading2 %></textarea
+              >
+              <label for="home">Paragraph</label>
+              <textarea
+                name="paragraph1"
+                id="park-paragraph1"
+                cols="30"
+                rows="10"
+              >
+<%= data.park.paragraph1 %></textarea
+              >
+            </div>
+            <button type="submit">Save</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h1>Privacy page</h1>
+        <div class="content">
+          <form method="POST" action="/admin-texts/privacy">
+            <div class="page-container">
+              <label for="home">Heading</label>
+              <textarea
+                name="heading1"
+                id="privacy-header1"
+                cols="30"
+                rows="10"
+              >
+<%= data.privacy.heading1 %></textarea
+              >
+              <label for="home">Privacy text</label>
+              <textarea
+                name="paragraph1"
+                id="privacy-paragraph1"
+                cols="30"
+                rows="10"
+              >
+<%= data.privacy.paragraph1 %></textarea
+              >
+            </div>
+            <button type="submit">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

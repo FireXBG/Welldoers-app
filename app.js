@@ -14,7 +14,13 @@ app.use(bodyParser.json());
 
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
-const { collection, doc, getDoc, getDocs } = require("firebase/firestore");
+const {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+} = require("firebase/firestore");
 const {
   getStorage,
   ref,
@@ -50,10 +56,16 @@ const user = auth.currentUser;
 async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
   try {
     const querySnapshot = await getDocs(collection(db, collectionName));
-    const data = querySnapshot.docs.reduce((acc, doc) => {
-      acc[doc.id] = doc.data().content;
-      return acc;
-    }, {});
+    const data = {};
+
+    querySnapshot.docs.forEach((doc) => {
+      const pageId = doc.id;
+      const pageData = doc.data();
+
+      // Assuming pageData has fields like header1, paragraph1, etc.
+      data[pageId] = pageData;
+    });
+
     res.render(templateName, { data });
   } catch (error) {
     console.error("Error getting documents:", error);
@@ -61,13 +73,44 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
   }
 }
 
+async function fetchMultipleData() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "texts"));
+    const data = {};
+
+    querySnapshot.docs.forEach((pageDoc) => {
+      const pageId = pageDoc.id;
+      const pageData = pageDoc.data();
+
+      // Clean up spaces in each field of pageData
+      Object.keys(pageData).forEach((field) => {
+        if (typeof pageData[field] === "string") {
+          pageData[field] = pageData[field].replace(/\s+/g, " ").trim();
+        }
+      });
+
+      // Assuming each pageData has fields like header1, paragraph1, etc.
+      data[pageId] = pageData;
+    });
+
+    return { data };
+  } catch (error) {
+    console.error("Error getting documents:", error);
+    throw error;
+  }
+}
+
 // Define routes using the common function
 app.get("/", async (req, res) => {
-  await fetchDataAndRenderPage("texts-index", "index", req, res);
+  await fetchDataAndRenderPage("texts", "index", req, res);
 });
 
 app.get("/park", async (req, res) => {
-  await fetchDataAndRenderPage("texts-park", "park", req, res);
+  await fetchDataAndRenderPage("texts", "park", req, res);
+});
+
+app.get("/privacy", async (req, res) => {
+  await fetchDataAndRenderPage("texts", "privacy", req, res);
 });
 
 // custom logic for prices page
@@ -82,10 +125,6 @@ app.get("/prices", async (req, res) => {
   } catch (error) {
     console.error("Error getting documents:", error);
   }
-});
-
-app.get("/privacy", async (req, res) => {
-  await fetchDataAndRenderPage("texts-privacy", "privacy", req, res);
 });
 
 app.get("/gallery", async (req, res) => {
@@ -104,7 +143,7 @@ app.get("/gallery", async (req, res) => {
       })
     );
 
-    // Render your gallery page with the image URLs
+    // Render gallery page with the image URLs
     res.render("gallery", { imageUrls });
   } catch (error) {
     console.error("Error fetching images:", error);
@@ -174,6 +213,92 @@ app.post("/logout", async (req, res) => {
   }
 });
 
+app.get("/admin/texts", async (req, res) => {
+  // Check the authentication state
+  const user = auth.currentUser;
+
+  if (user) {
+    try {
+      const { data } = await fetchMultipleData();
+      console.log(data);
+      res.render("admin-texts", { data });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    // User is not authenticated, redirect to login
+    res.redirect("/login");
+  }
+});
+
+app.get("/admin/partners", async (req, res) => {
+  // Check the authentication state
+  const user = auth.currentUser;
+
+  if (user) {
+    // User is authenticated, fetch data and render the admin page
+    try {
+      const querySnapshot = await getDocs(collection(db, "partners"));
+      const data = querySnapshot.docs.reduce((acc, doc) => {
+        acc[doc.id] = doc.data();
+        return acc;
+      }, {});
+
+      // Get images from storage with ordered id by last number sliced
+      const imagesRef = ref(storage, "partners");
+      const imagesList = await listAll(imagesRef);
+
+      const imageUrls = await Promise.all(
+        imagesList.items.map(async (imageRef) => {
+          const url = await getDownloadURL(imageRef);
+          return { imageUrl: url, name: imageRef.name };
+        })
+      );
+
+      // Render the page with the data and the images
+      res.render("admin-partners", { data, imageUrls });
+    } catch (error) {
+      console.error("Error getting documents:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    // User is not authenticated, redirect to login
+    res.redirect("/login");
+  }
+});
+
+app.get("/admin/gallery", async (req, res) => {
+  // Check the authentication state
+  const user = auth.currentUser;
+
+  if (user) {
+    try {
+      const imagesRef = ref(storage, "images");
+
+      // Get a list of all items (images) in the "images" folder
+      const imagesList = await listAll(imagesRef);
+
+      // Fetch the download URL for each image
+      const imageUrls = await Promise.all(
+        imagesList.items.map(async (imageRef) => {
+          const url = await getDownloadURL(imageRef);
+          return { imageUrl: url, name: imageRef.name };
+        })
+      );
+
+      // Render the gallery page with the image URLs
+      res.render("admin-gallery", { imageUrls });
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  } else {
+    // User is not authenticated, redirect to login
+    res.redirect("/login");
+  }
+});
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -195,6 +320,65 @@ app.post("/login", async (req, res) => {
 
     // Redirect back to the login page with an error message
     res.redirect("/login?error=true");
+  }
+});
+
+// update texts
+
+app.post("/admin-texts/index", async (req, res) => {
+  const {
+    header1,
+    paragraph1,
+    line1Heading,
+    line1Paragraph,
+    line2Heading,
+    line2Paragraph,
+  } = req.body;
+
+  try {
+    await setDoc(doc(db, "texts", "index"), {
+      header1,
+      paragraph1,
+      line1Heading,
+      line1Paragraph,
+      line2Heading,
+      line2Paragraph,
+    });
+    res.redirect("/admin/texts");
+  } catch (error) {
+    console.error("Error updating documents:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/admin-texts/park", async (req, res) => {
+  const { heading1, heading2, paragraph1 } = req.body;
+
+  try {
+    await setDoc(doc(db, "texts", "park"), {
+      heading1,
+      heading2,
+      paragraph1,
+    });
+    res.redirect("/admin/texts");
+  } catch (error) {
+    console.error("Error updating documents:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/admin-texts/privacy", async (req, res) => {
+  const { heading1, paragraph1 } = req.body;
+
+  try {
+    await setDoc(doc(db, "texts", "privacy"), {
+      heading1,
+      paragraph1,
+    });
+    res.redirect("/admin/texts");
+  } catch (error) {
+    console.error("Error updating documents:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
