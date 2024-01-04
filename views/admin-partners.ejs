@@ -22,38 +22,41 @@
           method="POST"
           action="/admin/partners/update"
           enctype="multipart/form-data"
+          class="partners-form"
         >
-          <% imageUrls.forEach((partner) => { %>
-          <div class="partner-container">
-            <label for="<%= partner.name %>_name">Partner Name</label>
-            <input
-              type="text"
-              name="<%= partner.name %>_name"
-              value="<%= data[partner.name].name %>"
-              required
-            />
+          <div class="partners-grid">
+            <% imageUrls.forEach((partner) => { %>
+            <div class="partner-container">
+              <label for="<%= partner.name %>_name">Partner Name</label>
+              <input
+                type="text"
+                name="<%= partner.name %>_name"
+                value="<%= data[partner.name].name %>"
+                required
+              />
 
-            <label for="<%= partner.name %>_website">Partner Website</label>
-            <input
-              type="text"
-              name="<%= partner.name %>_website"
-              value="<%= data[partner.name].website %>"
-              required
-            />
+              <label for="<%= partner.name %>_website">Partner Website</label>
+              <input
+                type="text"
+                name="<%= partner.name %>_website"
+                value="<%= data[partner.name].website %>"
+                required
+              />
 
-            <label for="<%= partner.name %>_image">Current Image</label>
-            <img
-              class="current-image"
-              src="<%= partner.imageUrl %>"
-              alt="<%= data[partner.name].name %>"
-            />
+              <label for="<%= partner.name %>_image">Current Image</label>
+              <img
+                class="current-image"
+                src="<%= partner.imageUrl %>"
+                alt="<%= data[partner.name].name %>"
+              />
 
-            <label for="<%= partner.name %>_new_image">New Image</label>
-            <input type="file" name="<%= partner.name %>_new_image" />
+              <label for="<%= partner.name %>_new_image">New Image</label>
+              <input type="file" name="<%= partner.name %>_new_image" />
 
-            <hr />
+              <hr />
+            </div>
+            <% }); %>
           </div>
-          <% }); %>
           <button type="submit">Save Changes</button>
         </form>
       </div>
