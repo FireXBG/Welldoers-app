@@ -220,7 +220,6 @@ app.get("/admin/texts", async (req, res) => {
   if (user) {
     try {
       const { data } = await fetchMultipleData();
-      console.log(data);
       res.render("admin-texts", { data });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -251,13 +250,15 @@ app.get("/admin/partners", async (req, res) => {
 
       const imageUrls = await Promise.all(
         imagesList.items.map(async (imageRef) => {
-          const url = await getDownloadURL(imageRef);
-          return { imageUrl: url, name: imageRef.name };
+          const imageName = imageRef.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+          const imageUrl = await getDownloadURL(imageRef).catch(() => null); // Handle the case where the image doesn't exist
+          return { imageUrl, name: imageName };
         })
       );
 
       // Render the page with the data and the images
       res.render("admin-partners", { data, imageUrls });
+      console.log(data, imageUrls);
     } catch (error) {
       console.error("Error getting documents:", error);
       res.status(500).send("Internal Server Error");
@@ -323,7 +324,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// update texts
+// Update texts
 
 app.post("/admin-texts/index", async (req, res) => {
   const {
