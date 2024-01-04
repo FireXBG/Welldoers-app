@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welldoers Admin - Login</title>
+    <link rel="stylesheet" href="/styles/admin-panel/login.css" />
+    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
+  </head>
+  <body>
+    <div class="login">
+      <h1>Welldoers Admin Panel</h1>
+      <div class="login-container">
+        <!-- Corrected form element -->
+        <form method="POST" action="/login">
+          <input type="text" name="email" id="email" placeholder="Email" />
+          <input
+            type="password"
+            name="password"
+            id="password"
+            placeholder="Password"
+          />
+          <button type="submit" id="login-btn">Login</button>
+        </form>
+      </div>
+      <p>Powered by Carica Web Development</p>
+    </div>
+  </body>
+</html>
