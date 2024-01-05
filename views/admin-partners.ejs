@@ -27,31 +27,33 @@
           <div class="partners-grid">
             <% imageUrls.forEach((partner) => { %>
             <div class="partner-container">
-              <label for="<%= partner.name %>_name">Partner Name</label>
+              <label for="<%= `partner_name_${partner.name}` %>"
+                >Partner Name</label
+              >
               <input
                 type="text"
-                name="<%= partner.name %>_name"
+                name="partner_name_<%= partner.name %>"
                 value="<%= data[partner.name].name %>"
                 required
               />
 
-              <label for="<%= partner.name %>_website">Partner Website</label>
+              <label for="<%= `partner_website_${partner.name}` %>"
+                >Partner Website</label
+              >
               <input
                 type="text"
-                name="<%= partner.name %>_website"
+                name="partner_website_<%= partner.name %>"
                 value="<%= data[partner.name].website %>"
                 required
               />
 
-              <label for="<%= partner.name %>_image">Current Image</label>
               <img
                 class="current-image"
                 src="<%= partner.imageUrl %>"
                 alt="<%= data[partner.name].name %>"
               />
 
-              <label for="<%= partner.name %>_new_image">New Image</label>
-              <input type="file" name="<%= partner.name %>_new_image" />
+              <input type="file" name="partner_image_<%= partner.name %>" />
 
               <hr />
             </div>
