@@ -1,12 +1,16 @@
 const express = require("express");
-const sendEmail = require("./public/JS/sendEmail");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+
+const sendEmail = require("./public/JS/sendEmail");
+
 const app = express();
 const port = 443;
 
+const upload = multer();
+
 app.set("view engine", "ejs");
 app.use(express.static("public"));
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -26,6 +30,10 @@ const {
   ref,
   listAll,
   getDownloadURL,
+  uploadBytes,
+  uploadBytesResumable,
+  getMetadata,
+  deleteObject,
 } = require("firebase/storage");
 const {
   getAuth,
@@ -220,7 +228,6 @@ app.get("/admin/texts", async (req, res) => {
   if (user) {
     try {
       const { data } = await fetchMultipleData();
-      console.log(data);
       res.render("admin-texts", { data });
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -251,8 +258,9 @@ app.get("/admin/partners", async (req, res) => {
 
       const imageUrls = await Promise.all(
         imagesList.items.map(async (imageRef) => {
-          const url = await getDownloadURL(imageRef);
-          return { imageUrl: url, name: imageRef.name };
+          const imageName = imageRef.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+          const imageUrl = await getDownloadURL(imageRef).catch(() => null); // Handle the case where the image doesn't exist
+          return { imageUrl, name: imageName };
         })
       );
 
@@ -323,7 +331,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// update texts
+// Update texts
 
 app.post("/admin-texts/index", async (req, res) => {
   const {
@@ -378,6 +386,64 @@ app.post("/admin-texts/privacy", async (req, res) => {
     res.redirect("/admin/texts");
   } catch (error) {
     console.error("Error updating documents:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Update partners
+
+app.post("/admin/partners/update", upload.any(), async (req, res) => {
+  try {
+    // Iterate over the submitted form data
+    for (const key in req.body) {
+      if (key.startsWith("partner_name_")) {
+        const partnerId = key.replace("partner_name_", "");
+
+        // Extract partner information
+        const partnerName = req.body[key];
+        const partnerWebsite = req.body[`partner_website_${partnerId}`];
+
+        // Update partner data in Firestore
+        await setDoc(doc(db, "partners", partnerId), {
+          name: partnerName,
+          website: partnerWebsite,
+        });
+
+        // Check if a new image is provided
+        const imageField = `partner_image_${partnerId}`;
+        if (
+          req.files &&
+          req.files.find((file) => file.fieldname === imageField)
+        ) {
+          const newImageFile = req.files.find(
+            (file) => file.fieldname === imageField
+          );
+
+          // Delete existing images (both .jpg and .png)
+          const existingImagesRef = ref(storage, "partners");
+          const existingImagesList = await listAll(existingImagesRef);
+
+          const deletePromises = existingImagesList.items.map(async (item) => {
+            const imageName = item.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+            if (imageName === partnerId) {
+              await deleteObject(item);
+            }
+          });
+
+          await Promise.all(deletePromises);
+
+          // Upload the new image to Storage
+          const newImageRef = ref(storage, `partners/${partnerId}.jpg`);
+          await uploadBytesResumable(newImageRef, newImageFile.buffer, {
+            contentType: newImageFile.mimetype,
+          });
+        }
+      }
+    }
+
+    res.redirect("/admin/partners");
+  } catch (error) {
+    console.error("Error updating partner:", error);
     res.status(500).send("Internal Server Error");
   }
 });
