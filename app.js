@@ -291,7 +291,7 @@ app.get("/admin/gallery", async (req, res) => {
       const imagesList = await listAll(imagesRef);
 
       // Fetch the download URL for each image
-      const imageUrls = await Promise.all(
+      const gallery = await Promise.all(
         imagesList.items.map(async (imageRef) => {
           const url = await getDownloadURL(imageRef);
           return { imageUrl: url, name: imageRef.name };
@@ -299,7 +299,7 @@ app.get("/admin/gallery", async (req, res) => {
       );
 
       // Render the gallery page with the image URLs
-      res.render("admin-gallery", { imageUrls });
+      res.render("admin-gallery", { gallery });
     } catch (error) {
       console.error("Error fetching images:", error);
       res.status(500).send("Internal Server Error");
@@ -538,6 +538,51 @@ app.post("/admin/partners/delete", async (req, res) => {
     res.redirect("/admin/partners");
   } catch (error) {
     console.error("Error deleting partner:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// gallery delete selected images
+
+app.post("/admin/gallery/delete", async (req, res) => {
+  try {
+    const selectedImages = req.body.delete || [];
+
+    // Dekete selected images by name
+
+    const existingImagesRef = ref(storage, "images");
+
+    const deletePromises = selectedImages.map(async (imageName) => {
+      const imageRef = ref(existingImagesRef, imageName);
+      await deleteObject(imageRef);
+    });
+
+    await Promise.all(deletePromises);
+
+    res.redirect("/admin/gallery");
+  } catch (error) {
+    console.error("Error deleting images:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// gallery upload images
+
+app.post("/admin/gallery/upload", upload.any(), async (req, res) => {
+  try {
+    // Upload all the images
+    const uploadPromises = req.files.map(async (file) => {
+      const imageRef = ref(storage, `images/${file.originalname}`);
+      await uploadBytesResumable(imageRef, file.buffer, {
+        contentType: file.mimetype,
+      });
+    });
+
+    await Promise.all(uploadPromises);
+
+    res.redirect("/admin/gallery");
+  } catch (error) {
+    console.error("Error uploading images:", error);
     res.status(500).send("Internal Server Error");
   }
 });
