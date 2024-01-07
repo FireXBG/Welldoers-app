@@ -18,15 +18,16 @@
     <div class="dashboard">
       <%- include('partials/admin-menu') %>
       <div class="content">
-        <form
-          method="POST"
-          action="/admin/partners/update"
-          enctype="multipart/form-data"
-          class="partners-form"
-        >
-          <div class="partners-grid">
-            <% imageUrls.forEach((partner) => { %>
-            <div class="partner-container">
+        <h1 class="partners-h1">Partners</h1>
+        <div class="partners-grid">
+          <% imageUrls.forEach((partner) => { %>
+          <div class="partner-container">
+            <form
+              method="POST"
+              action="/admin/partners/update"
+              enctype="multipart/form-data"
+              class="partners-form"
+            >
               <label for="<%= `partner_name_${partner.name}` %>"
                 >Partner Name</label
               >
@@ -54,12 +55,39 @@
               />
 
               <input type="file" name="partner_image_<%= partner.name %>" />
-
-              <hr />
-            </div>
-            <% }); %>
+              <input
+                type="hidden"
+                name="partner_id"
+                value="<%= partner.name %>"
+              />
+              <button type="submit">Save Changes</button>
+            </form>
+            <form action="/admin/partners/delete" method="POST">
+              <input
+                type="hidden"
+                name="partner_id"
+                id="partner_id"
+                value="<%= partner.name %>"
+              />
+              <button type="submit">Delete Partner</button>
+            </form>
           </div>
-          <button type="submit">Save Changes</button>
+          <% }); %>
+        </div>
+        <h1 class="partners-h1">Add a partner</h1>
+        <form
+          method="POST"
+          action="/admin/partners/add"
+          enctype="multipart/form-data"
+          class="add-partner-form"
+        >
+          <label for="">Partner Name</label>
+          <input type="text" name="partner_name_" id="" />
+          <label for="">Partner Website</label>
+          <input type="text" name="partner_website_" id="" />
+          <label for="">Partner Image</label>
+          <input type="file" name="partner_image_" id="" />
+          <button type="submit">Add Partner</button>
         </form>
       </div>
     </div>

@@ -3,9 +3,14 @@
     margin-left: 20%;
 }
 
+.partners-h1 {
+    text-align: center;
+    margin: 2rem;
+}
+
 .partners-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 1rem;
     padding: 5rem;
 }
@@ -14,6 +19,21 @@
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.378);
     border-radius: 10px;
     padding: 1rem;
+}
+
+.add-partner-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    margin: 2rem 10rem;
+    box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.378);
+    border-radius: 10px;
+}
+
+.add-partner-form input {
+    width: 50%;
 }
 
 label {
@@ -36,14 +56,19 @@ input {
     margin: 0.5rem;
 }
 
+.delete-partner-btn {
+    margin-left: 0;
+    margin-top: 2rem;
+}
+
 button {
-    margin-left: 5rem;
     border: solid 0.2rem black;
     width: 20%;
     background-color: black;
     color: white;
     padding: 0.5rem;
     transition: 200ms;
+    margin-top: 1rem;
 }
 
 button:hover {
