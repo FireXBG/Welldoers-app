@@ -21,9 +21,12 @@ const { getFirestore } = require("firebase/firestore");
 const {
   collection,
   doc,
-  getDoc,
   getDocs,
   setDoc,
+  deleteDoc,
+  query,
+  orderBy,
+  limit,
 } = require("firebase/firestore");
 const {
   getStorage,
@@ -444,6 +447,97 @@ app.post("/admin/partners/update", upload.any(), async (req, res) => {
     res.redirect("/admin/partners");
   } catch (error) {
     console.error("Error updating partner:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/admin/partners/add", upload.any(), async (req, res) => {
+  try {
+    // Get the last id from the partners collection
+    const querySnapshot = await getDocs(
+      query(collection(db, "partners"), orderBy("__name__", "desc"), limit(1))
+    );
+
+    if (querySnapshot.docs.length > 0) {
+      const lastId = parseInt(querySnapshot.docs[0].id.replace("partner", ""));
+      console.log("Last ID:", lastId);
+
+      // Get data from the form
+      const { partner_name_, partner_website_ } = req.body;
+
+      // Image upload with id as name
+      const imageField = "partner_image_";
+      const newImageFile = req.files.find(
+        (file) => file.fieldname === imageField
+      );
+
+      if (!newImageFile) {
+        console.error("Error: File not found");
+        res.status(400).send("Bad Request: File not found");
+        return;
+      }
+
+      if (!newImageFile.buffer) {
+        console.error("Error: File buffer is undefined");
+        res.status(400).send("Bad Request: File buffer is undefined");
+        return;
+      }
+
+      console.log("File Buffer Size:", newImageFile.buffer.length);
+
+      const newImageRef = ref(storage, `partners/partner${lastId + 1}.jpg`);
+      await uploadBytesResumable(newImageRef, newImageFile.buffer, {
+        contentType: newImageFile.mimetype,
+      });
+
+      // Add data to the partners collection
+      await setDoc(doc(db, "partners", `partner${lastId + 1}`), {
+        name: partner_name_,
+        website: partner_website_,
+        id: lastId + 1,
+      });
+
+      res.redirect("/admin/partners");
+    } else {
+      // Handle the case where there are no documents in the collection
+      console.error("Error: No documents found in the 'partners' collection");
+      res.status(404).send("No documents found in the 'partners' collection");
+    }
+  } catch (error) {
+    console.error("Error adding partner:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// Delete partners
+
+// Delete partners
+app.post("/admin/partners/delete", async (req, res) => {
+  try {
+    const partnerId = req.body.partner_id;
+    console.log("Deleting partner:", partnerId);
+
+    // Delete existing images (both .jpg and .png)
+
+    const existingImagesRef = ref(storage, "partners");
+    const existingImagesList = await listAll(existingImagesRef);
+
+    const deletePromises = existingImagesList.items.map(async (item) => {
+      const imageName = item.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+      if (imageName === partnerId) {
+        await deleteObject(item);
+      }
+    });
+
+    await Promise.all(deletePromises);
+
+    // Delete the partner from Firestore
+
+    await deleteDoc(doc(db, "partners", partnerId));
+
+    res.redirect("/admin/partners");
+  } catch (error) {
+    console.error("Error deleting partner:", error);
     res.status(500).send("Internal Server Error");
   }
 });
