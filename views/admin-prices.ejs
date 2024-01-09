@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - Welldoers</title>
+    <link rel="stylesheet" href="/styles/global.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-prices.css" />
+  </head>
+  <body>
+    <form method="POST" action="/logout">
+      <button type="submit" class="logout">
+        <img src="/img/icon-sign-out.svg" alt="" />
+      </button>
+    </form>
+    <div class="dashboard">
+      <%- include('partials/admin-menu') %>
+      <div class="content">
+        <h1 class="main-heading">Prices</h1>
+
+        <!-- Your Form for Editing Prices -->
+        <!-- Your Form for Editing Prices -->
+        <form method="POST" action="/admin/prices/update">
+          <table>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Price</th>
+                <th></th>
+                <!-- New column for delete button -->
+              </tr>
+            </thead>
+            <tbody>
+              <% data.forEach((item, index) => { %>
+              <tr>
+                <!-- Left side - Service Input -->
+                <td>
+                  <input
+                    type="text"
+                    name="services[]"
+                    value="<%= item.service %>"
+                    required
+                  />
+                </td>
+
+                <!-- Right side - Price Input -->
+                <td>
+                  <input
+                    type="number"
+                    name="prices[]"
+                    value="<%= item.price %>"
+                    required
+                  />
+                </td>
+
+                <!-- Delete button -->
+                <td>
+                  <button
+                    type="button"
+                    class="delete-service"
+                    data-index="<%= index %>"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+              <% }); %>
+            </tbody>
+          </table>
+
+          <!-- Save button -->
+          <button type="submit" class="save-btn">Save</button>
+          <button type="button" class="add-service">Add new service</button>
+        </form>
+      </div>
+    </div>
+    <script src="/JS/adminServices.js"></script>
+  </body>
+</html>

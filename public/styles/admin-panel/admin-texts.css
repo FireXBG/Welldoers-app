@@ -33,7 +33,7 @@ textarea {
     border: solid 0.1rem #000;
 }
 
-textarea:focus {
+textarea:hover {
     outline: none;
     height: 10rem;
     background-color: #f5f5f5;

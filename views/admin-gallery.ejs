@@ -32,7 +32,7 @@
             </div>
             <% } %>
           </div>
-          <input type="submit" value="Delete" class="delete" />
+          <input type="submit" value="Delete selected images" class="delete" />
         </form>
         <form
           class="add-form"
@@ -40,7 +40,7 @@
           method="POST"
           enctype="multipart/form-data"
         >
-          <input type="file" name="image" />
+          <input class="choose-file" type="file" name="image" />
           <input type="submit" value="Add" class="add" />
         </form>
       </div>

@@ -73,7 +73,6 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
       const pageId = doc.id;
       const pageData = doc.data();
 
-      // Assuming pageData has fields like header1, paragraph1, etc.
       data[pageId] = pageData;
     });
 
@@ -100,7 +99,6 @@ async function fetchMultipleData() {
         }
       });
 
-      // Assuming each pageData has fields like header1, paragraph1, etc.
       data[pageId] = pageData;
     });
 
@@ -307,6 +305,22 @@ app.get("/admin/gallery", async (req, res) => {
   } else {
     // User is not authenticated, redirect to login
     res.redirect("/login");
+  }
+});
+
+app.get("/admin/prices", async (req, res) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "prices"));
+
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.render("admin-prices", { data });
+  } catch (error) {
+    console.error("Error getting documents for page prices:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -587,6 +601,35 @@ app.post("/admin/gallery/upload", upload.any(), async (req, res) => {
   }
 });
 
+app.post("/admin/prices/update", async (req, res) => {
+  try {
+    const { services, prices } = req.body;
+
+    // Clear the existing data in the "prices" collection
+    const pricesRef = collection(db, "prices");
+    const snapshot = await getDocs(pricesRef);
+
+    // Delete each document in the "prices" collection
+    snapshot.forEach((doc) => {
+      deleteDoc(doc.ref);
+    });
+
+    // Update the "prices" collection with the new data
+    for (let i = 0; i < services.length; i++) {
+      const docRef = doc(pricesRef, i.toString());
+      await setDoc(docRef, {
+        service: services[i],
+        price: prices[i],
+      });
+    }
+
+    res.redirect("/admin/prices");
+  } catch (error) {
+    console.error("Error updating prices:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 // email handle
 
 app.post("/send", (req, res) => {
@@ -602,5 +645,5 @@ app.post("/send", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`App listening at http://localhost:${port}`);
+  console.log(`App listening at posr: ${port}`);
 });

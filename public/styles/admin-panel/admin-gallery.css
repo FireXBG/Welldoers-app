@@ -12,6 +12,10 @@
 margin: 5rem;
 }
 
+.add-form {
+    margin: 5rem;
+} 
+
 .gallery {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -21,4 +25,31 @@ margin: 5rem;
     width: 200px;
     height: 200px;
     object-fit: contain;
+}
+
+.delete {
+    margin-top: 10rem;
+}
+
+.delete,
+.add {
+    border: solid 0.2rem black;
+    width: 20%;
+    background-color: black;
+    color: white;
+    padding: 0.5rem;
+    transition: 200ms;
+}
+
+.delete:hover,
+.add:hover {
+    background-color: white;
+    color: black;
+    border: solid 0.2rem black;
+}
+
+button:hover {
+    background-color: white;
+    color: black;
+    border: solid 0.2rem black;
 }
