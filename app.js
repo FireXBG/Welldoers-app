@@ -83,6 +83,25 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
   }
 }
 
+async function fetchWithoutRender(collectionName) {
+  try {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    const data = {};
+
+    querySnapshot.docs.forEach((doc) => {
+      const pageId = doc.id;
+      const pageData = doc.data();
+
+      data[pageId] = pageData;
+    });
+
+    return { data };
+  } catch (error) {
+    console.log(error);
+    console.error("Error getting documents:", error);
+  }
+}
+
 async function fetchMultipleData() {
   try {
     const querySnapshot = await getDocs(collection(db, "texts"));
@@ -111,7 +130,31 @@ async function fetchMultipleData() {
 
 // Define routes using the common function
 app.get("/", async (req, res) => {
-  await fetchDataAndRenderPage("texts", "index", req, res);
+  await fetchWithoutRender("texts");
+
+  // video ref
+
+  const videoRef = ref(storage, "/videos/Wake.mp4");
+
+  // render texts for index page
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "texts"));
+    const data = {};
+
+    querySnapshot.docs.forEach((doc) => {
+      const pageId = doc.id;
+      const pageData = doc.data();
+
+      data[pageId] = pageData;
+    });
+
+    const videoUrl = await getDownloadURL(videoRef);
+
+    res.render("index", { data, videoUrl });
+  } catch (error) {
+    console.error("Error getting documents:", error);
+  }
 });
 
 app.get("/park", async (req, res) => {

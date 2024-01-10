@@ -74,17 +74,4 @@
         right: 2rem;
         z-index: 2;
     }
-
-    .links a:last-child {
-        display: flex;
-        background-color: white;
-        color: black;
-        padding: 0;
-        width: 12rem;
-        height: 2.8rem;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.1rem;
-        display: none;
-    }
 }
