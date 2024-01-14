@@ -29,24 +29,17 @@
     <%- include('partials/header') %>
 
     <section class="slideshow">
-      <video playsinline autoplay muted loop src="/video/Wake.mp4"></video>
+      <video playsinline autoplay muted loop src="<%= videoUrl %>"></video>
       <span id="typed"></span>
       <div class="arrow-down"><p>&darr;</p></div>
     </section>
 
     <section class="welcomeSection">
+      <img src="/img/wakeboarder1.png" alt="" />
       <div class="welcome-content">
         <h1><%= data.index.header1 %></h1>
         <p><%= data.index.paragraph1 %></p>
       </div>
-      <iframe
-        class="welcomeVideo"
-        src="https://www.youtube.com/embed/KFiMFCGiQx0"
-        title="fail"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowfullscreen
-      ></iframe>
     </section>
 
     <section class="lines">

@@ -73,7 +73,6 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
       const pageId = doc.id;
       const pageData = doc.data();
 
-      // Assuming pageData has fields like header1, paragraph1, etc.
       data[pageId] = pageData;
     });
 
@@ -81,6 +80,25 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
   } catch (error) {
     console.error("Error getting documents:", error);
     res.status(500).send("Internal Server Error");
+  }
+}
+
+async function fetchWithoutRender(collectionName) {
+  try {
+    const querySnapshot = await getDocs(collection(db, collectionName));
+    const data = {};
+
+    querySnapshot.docs.forEach((doc) => {
+      const pageId = doc.id;
+      const pageData = doc.data();
+
+      data[pageId] = pageData;
+    });
+
+    return { data };
+  } catch (error) {
+    console.log(error);
+    console.error("Error getting documents:", error);
   }
 }
 
@@ -100,7 +118,6 @@ async function fetchMultipleData() {
         }
       });
 
-      // Assuming each pageData has fields like header1, paragraph1, etc.
       data[pageId] = pageData;
     });
 
@@ -113,7 +130,31 @@ async function fetchMultipleData() {
 
 // Define routes using the common function
 app.get("/", async (req, res) => {
-  await fetchDataAndRenderPage("texts", "index", req, res);
+  await fetchWithoutRender("texts");
+
+  // video ref
+
+  const videoRef = ref(storage, "/videos/Wake.mp4");
+
+  // render texts for index page
+
+  try {
+    const querySnapshot = await getDocs(collection(db, "texts"));
+    const data = {};
+
+    querySnapshot.docs.forEach((doc) => {
+      const pageId = doc.id;
+      const pageData = doc.data();
+
+      data[pageId] = pageData;
+    });
+
+    const videoUrl = await getDownloadURL(videoRef);
+
+    res.render("index", { data, videoUrl });
+  } catch (error) {
+    console.error("Error getting documents:", error);
+  }
 });
 
 app.get("/park", async (req, res) => {
@@ -291,7 +332,7 @@ app.get("/admin/gallery", async (req, res) => {
       const imagesList = await listAll(imagesRef);
 
       // Fetch the download URL for each image
-      const imageUrls = await Promise.all(
+      const gallery = await Promise.all(
         imagesList.items.map(async (imageRef) => {
           const url = await getDownloadURL(imageRef);
           return { imageUrl: url, name: imageRef.name };
@@ -299,7 +340,7 @@ app.get("/admin/gallery", async (req, res) => {
       );
 
       // Render the gallery page with the image URLs
-      res.render("admin-gallery", { imageUrls });
+      res.render("admin-gallery", { gallery });
     } catch (error) {
       console.error("Error fetching images:", error);
       res.status(500).send("Internal Server Error");
@@ -307,6 +348,22 @@ app.get("/admin/gallery", async (req, res) => {
   } else {
     // User is not authenticated, redirect to login
     res.redirect("/login");
+  }
+});
+
+app.get("/admin/prices", async (req, res) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "prices"));
+
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.render("admin-prices", { data });
+  } catch (error) {
+    console.error("Error getting documents for page prices:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -542,6 +599,80 @@ app.post("/admin/partners/delete", async (req, res) => {
   }
 });
 
+// gallery delete selected images
+
+app.post("/admin/gallery/delete", async (req, res) => {
+  try {
+    const selectedImages = req.body.delete || [];
+
+    // Dekete selected images by name
+
+    const existingImagesRef = ref(storage, "images");
+
+    const deletePromises = selectedImages.map(async (imageName) => {
+      const imageRef = ref(existingImagesRef, imageName);
+      await deleteObject(imageRef);
+    });
+
+    await Promise.all(deletePromises);
+
+    res.redirect("/admin/gallery");
+  } catch (error) {
+    console.error("Error deleting images:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// gallery upload images
+
+app.post("/admin/gallery/upload", upload.any(), async (req, res) => {
+  try {
+    // Upload all the images
+    const uploadPromises = req.files.map(async (file) => {
+      const imageRef = ref(storage, `images/${file.originalname}`);
+      await uploadBytesResumable(imageRef, file.buffer, {
+        contentType: file.mimetype,
+      });
+    });
+
+    await Promise.all(uploadPromises);
+
+    res.redirect("/admin/gallery");
+  } catch (error) {
+    console.error("Error uploading images:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/admin/prices/update", async (req, res) => {
+  try {
+    const { services, prices } = req.body;
+
+    // Clear the existing data in the "prices" collection
+    const pricesRef = collection(db, "prices");
+    const snapshot = await getDocs(pricesRef);
+
+    // Delete each document in the "prices" collection
+    snapshot.forEach((doc) => {
+      deleteDoc(doc.ref);
+    });
+
+    // Update the "prices" collection with the new data
+    for (let i = 0; i < services.length; i++) {
+      const docRef = doc(pricesRef, i.toString());
+      await setDoc(docRef, {
+        service: services[i],
+        price: prices[i],
+      });
+    }
+
+    res.redirect("/admin/prices");
+  } catch (error) {
+    console.error("Error updating prices:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 // email handle
 
 app.post("/send", (req, res) => {
@@ -557,5 +688,5 @@ app.post("/send", (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`App listening at posr: ${port}`);
 });
