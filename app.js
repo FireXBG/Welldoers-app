@@ -66,7 +66,10 @@ const user = auth.currentUser;
 
 async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
   try {
-    const querySnapshot = await getDocs(collection(db, collectionName));
+    const querySnapshot = await getDocs(
+      collection(db, collectionName),
+      orderBy("order")
+    );
     const data = {};
 
     querySnapshot.docs.forEach((doc) => {
@@ -76,6 +79,7 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
       data[pageId] = pageData;
     });
 
+    console.log(data);
     res.render(templateName, { data });
   } catch (error) {
     console.error("Error getting documents:", error);
@@ -149,9 +153,9 @@ app.get("/", async (req, res) => {
       data[pageId] = pageData;
     });
 
-    const videoUrl = await getDownloadURL(videoRef);
+    // const videoUrl = await getDownloadURL(videoRef);
 
-    res.render("index", { data, videoUrl });
+    res.render("index", { data /* videoUrl */ });
   } catch (error) {
     console.error("Error getting documents:", error);
   }
@@ -231,6 +235,10 @@ app.get("/friends", async (req, res) => {
   // then render the page with the data and the images
 
   res.render("friends", { data, imageUrls });
+});
+
+app.get("/rules", async (req, res) => {
+  await fetchDataAndRenderPage("texts", "rules", req, res);
 });
 
 // admin panel system
@@ -365,6 +373,10 @@ app.get("/admin/prices", async (req, res) => {
     console.error("Error getting documents for page prices:", error);
     res.status(500).send("Internal Server Error");
   }
+});
+
+app.get("/admin/rules", async (req, res) => {
+  fetchDataAndRenderPage("texts", "admin-rules", req, res);
 });
 
 app.post("/login", async (req, res) => {
@@ -672,6 +684,8 @@ app.post("/admin/prices/update", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+
+// rules
 
 // email handle
 

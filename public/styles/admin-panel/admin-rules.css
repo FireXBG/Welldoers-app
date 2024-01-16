@@ -1,0 +1,20 @@
+h1 {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.content {
+    margin-left: 20vw;
+}
+
+.rules-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+input {
+    width: 50%;
+}

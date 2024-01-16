@@ -92,9 +92,10 @@ nav {
 
 .welcomeSection img {
     position: absolute;
-    top: 0;
-    left: -10rem;
+    top: 2rem;
+    left: 0;
     width: 30vw;
+    rotate: -10deg;
 }
 
 /* wakeboard lines */

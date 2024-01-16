@@ -1,0 +1,20 @@
+h1 {
+    text-align: center;
+}
+
+.rules-section {
+    min-height: 70vh;
+}
+
+ul {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem
+}
+
+li {
+    font-size: 1.2rem;
+}
