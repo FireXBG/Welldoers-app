@@ -33,23 +33,7 @@ input {
     border: solid 0.2rem black;
 }
 
-button {
-    border: solid 0.2rem black;
-    width: 20%;
-    background-color: black;
-    color: white;
-    padding: 0.5rem;
-    transition: 200ms;
-    min-width: 5rem;
-}
-
-button:hover {
-    background-color: white;
-    color: black;
-    border: solid 0.2rem black;
-}
-
-.save-btn,
-.add-service {
-    margin-top: 3rem;
+.delete-service {
+    width: 100% !important;
+    margin-top: 0 !important;
 }

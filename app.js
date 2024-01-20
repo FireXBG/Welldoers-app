@@ -22,10 +22,12 @@ const {
   collection,
   doc,
   getDocs,
+  getDoc,
   setDoc,
   deleteDoc,
   query,
   orderBy,
+  updateDoc,
   limit,
 } = require("firebase/firestore");
 const {
@@ -33,9 +35,7 @@ const {
   ref,
   listAll,
   getDownloadURL,
-  uploadBytes,
   uploadBytesResumable,
-  getMetadata,
   deleteObject,
 } = require("firebase/storage");
 const {
@@ -60,7 +60,28 @@ const db = getFirestore();
 const storage = getStorage(firebaseApp);
 const auth = getAuth();
 
-const user = auth.currentUser;
+// user authentication
+
+async function checkAuthentication(req, res, next) {
+  try {
+    const user = await new Promise((resolve) => {
+      onAuthStateChanged(auth, (user) => {
+        resolve(user);
+      });
+    });
+
+    if (user) {
+      console.log("Authenticated user.");
+      next(); // Continue to the next middleware or route
+    } else {
+      console.log("User is signed out");
+      res.redirect("/login"); // Redirect to the login page
+    }
+  } catch (error) {
+    console.error("Error checking authentication:", error);
+    res.status(500).send("Internal Server Error");
+  }
+}
 
 // routes
 
@@ -79,7 +100,6 @@ async function fetchDataAndRenderPage(collectionName, templateName, req, res) {
       data[pageId] = pageData;
     });
 
-    console.log(data);
     res.render(templateName, { data });
   } catch (error) {
     console.error("Error getting documents:", error);
@@ -241,19 +261,14 @@ app.get("/rules", async (req, res) => {
   await fetchDataAndRenderPage("texts", "rules", req, res);
 });
 
-// admin panel system
+/*******************************************/
+/**           // ADMIN PANEL //           **/
+/*******************************************/
 
-app.get("/admin", (req, res) => {
-  // Check the authentication state
-  const user = auth.currentUser;
+// GET ROUTES
 
-  if (user) {
-    // User is authenticated, render the admin page
-    res.render("admin");
-  } else {
-    // User is not authenticated, redirect to login
-    res.redirect("/login");
-  }
+app.get("/admin", checkAuthentication, (req, res) => {
+  res.render("admin");
 });
 
 app.get("/login", (req, res) => {
@@ -273,93 +288,68 @@ app.post("/logout", async (req, res) => {
   }
 });
 
-app.get("/admin/texts", async (req, res) => {
-  // Check the authentication state
-  const user = auth.currentUser;
-
-  if (user) {
-    try {
-      const { data } = await fetchMultipleData();
-      res.render("admin-texts", { data });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      res.status(500).send("Internal Server Error");
-    }
-  } else {
-    // User is not authenticated, redirect to login
-    res.redirect("/login");
+app.get("/admin/texts", checkAuthentication, async (req, res) => {
+  try {
+    const { data } = await fetchMultipleData();
+    res.render("admin-texts", { data });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
-app.get("/admin/partners", async (req, res) => {
-  // Check the authentication state
-  const user = auth.currentUser;
+app.get("/admin/partners", checkAuthentication, async (req, res) => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "partners"));
+    const data = querySnapshot.docs.reduce((acc, doc) => {
+      acc[doc.id] = doc.data();
+      return acc;
+    }, {});
 
-  if (user) {
-    // User is authenticated, fetch data and render the admin page
-    try {
-      const querySnapshot = await getDocs(collection(db, "partners"));
-      const data = querySnapshot.docs.reduce((acc, doc) => {
-        acc[doc.id] = doc.data();
-        return acc;
-      }, {});
+    // Get images from storage with ordered id by last number sliced
+    const imagesRef = ref(storage, "partners");
+    const imagesList = await listAll(imagesRef);
 
-      // Get images from storage with ordered id by last number sliced
-      const imagesRef = ref(storage, "partners");
-      const imagesList = await listAll(imagesRef);
+    const imageUrls = await Promise.all(
+      imagesList.items.map(async (imageRef) => {
+        const imageName = imageRef.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+        const imageUrl = await getDownloadURL(imageRef).catch(() => null); // Handle the case where the image doesn't exist
+        return { imageUrl, name: imageName };
+      })
+    );
 
-      const imageUrls = await Promise.all(
-        imagesList.items.map(async (imageRef) => {
-          const imageName = imageRef.name.replace(/\.[^/.]+$/, ""); // Remove file extension
-          const imageUrl = await getDownloadURL(imageRef).catch(() => null); // Handle the case where the image doesn't exist
-          return { imageUrl, name: imageName };
-        })
-      );
-
-      // Render the page with the data and the images
-      res.render("admin-partners", { data, imageUrls });
-    } catch (error) {
-      console.error("Error getting documents:", error);
-      res.status(500).send("Internal Server Error");
-    }
-  } else {
-    // User is not authenticated, redirect to login
-    res.redirect("/login");
+    // Render the page with the data and the images
+    res.render("admin-partners", { data, imageUrls });
+  } catch (error) {
+    console.error("Error getting documents:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
-app.get("/admin/gallery", async (req, res) => {
-  // Check the authentication state
-  const user = auth.currentUser;
+app.get("/admin/gallery", checkAuthentication, async (req, res) => {
+  try {
+    const imagesRef = ref(storage, "images");
 
-  if (user) {
-    try {
-      const imagesRef = ref(storage, "images");
+    // Get a list of all items (images) in the "images" folder
+    const imagesList = await listAll(imagesRef);
 
-      // Get a list of all items (images) in the "images" folder
-      const imagesList = await listAll(imagesRef);
+    // Fetch the download URL for each image
+    const gallery = await Promise.all(
+      imagesList.items.map(async (imageRef) => {
+        const url = await getDownloadURL(imageRef);
+        return { imageUrl: url, name: imageRef.name };
+      })
+    );
 
-      // Fetch the download URL for each image
-      const gallery = await Promise.all(
-        imagesList.items.map(async (imageRef) => {
-          const url = await getDownloadURL(imageRef);
-          return { imageUrl: url, name: imageRef.name };
-        })
-      );
-
-      // Render the gallery page with the image URLs
-      res.render("admin-gallery", { gallery });
-    } catch (error) {
-      console.error("Error fetching images:", error);
-      res.status(500).send("Internal Server Error");
-    }
-  } else {
-    // User is not authenticated, redirect to login
-    res.redirect("/login");
+    // Render the gallery page with the image URLs
+    res.render("admin-gallery", { gallery });
+  } catch (error) {
+    console.error("Error fetching images:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
-app.get("/admin/prices", async (req, res) => {
+app.get("/admin/prices", checkAuthentication, async (req, res) => {
   try {
     const querySnapshot = await getDocs(collection(db, "prices"));
 
@@ -375,9 +365,11 @@ app.get("/admin/prices", async (req, res) => {
   }
 });
 
-app.get("/admin/rules", async (req, res) => {
+app.get("/admin/rules", checkAuthentication, async (req, res) => {
   fetchDataAndRenderPage("texts", "admin-rules", req, res);
 });
+
+// POST ROUTES
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -390,7 +382,9 @@ app.post("/login", async (req, res) => {
       password
     );
     const user = userCredential.user;
-    res.redirect("/admin");
+
+    // Redirect to the admin page after successful login
+    return res.redirect("/admin");
   } catch (error) {
     const errorCode = error.code;
     const errorMessage = error.message;
@@ -399,13 +393,13 @@ app.post("/login", async (req, res) => {
     );
 
     // Redirect back to the login page with an error message
-    res.redirect("/login?error=true");
+    return res.redirect("/login?error=true");
   }
 });
 
 // Update texts
 
-app.post("/admin-texts/index", async (req, res) => {
+app.post("/admin-texts/index", checkAuthentication, async (req, res) => {
   const {
     header1,
     paragraph1,
@@ -431,7 +425,7 @@ app.post("/admin-texts/index", async (req, res) => {
   }
 });
 
-app.post("/admin-texts/park", async (req, res) => {
+app.post("/admin-texts/park", checkAuthentication, async (req, res) => {
   const { heading1, heading2, paragraph1 } = req.body;
 
   try {
@@ -447,7 +441,7 @@ app.post("/admin-texts/park", async (req, res) => {
   }
 });
 
-app.post("/admin-texts/privacy", async (req, res) => {
+app.post("/admin-texts/privacy", checkAuthentication, async (req, res) => {
   const { heading1, paragraph1 } = req.body;
 
   try {
@@ -464,124 +458,138 @@ app.post("/admin-texts/privacy", async (req, res) => {
 
 // Update partners
 
-app.post("/admin/partners/update", upload.any(), async (req, res) => {
-  try {
-    // Iterate over the submitted form data
-    for (const key in req.body) {
-      if (key.startsWith("partner_name_")) {
-        const partnerId = key.replace("partner_name_", "");
+app.post(
+  "/admin/partners/update",
+  checkAuthentication,
+  upload.any(),
+  async (req, res) => {
+    try {
+      // Iterate over the submitted form data
+      for (const key in req.body) {
+        if (key.startsWith("partner_name_")) {
+          const partnerId = key.replace("partner_name_", "");
 
-        // Extract partner information
-        const partnerName = req.body[key];
-        const partnerWebsite = req.body[`partner_website_${partnerId}`];
+          // Extract partner information
+          const partnerName = req.body[key];
+          const partnerWebsite = req.body[`partner_website_${partnerId}`];
 
-        // Update partner data in Firestore
-        await setDoc(doc(db, "partners", partnerId), {
-          name: partnerName,
-          website: partnerWebsite,
-        });
-
-        // Check if a new image is provided
-        const imageField = `partner_image_${partnerId}`;
-        if (
-          req.files &&
-          req.files.find((file) => file.fieldname === imageField)
-        ) {
-          const newImageFile = req.files.find(
-            (file) => file.fieldname === imageField
-          );
-
-          // Delete existing images (both .jpg and .png)
-          const existingImagesRef = ref(storage, "partners");
-          const existingImagesList = await listAll(existingImagesRef);
-
-          const deletePromises = existingImagesList.items.map(async (item) => {
-            const imageName = item.name.replace(/\.[^/.]+$/, ""); // Remove file extension
-            if (imageName === partnerId) {
-              await deleteObject(item);
-            }
+          // Update partner data in Firestore
+          await setDoc(doc(db, "partners", partnerId), {
+            name: partnerName,
+            website: partnerWebsite,
           });
 
-          await Promise.all(deletePromises);
+          // Check if a new image is provided
+          const imageField = `partner_image_${partnerId}`;
+          if (
+            req.files &&
+            req.files.find((file) => file.fieldname === imageField)
+          ) {
+            const newImageFile = req.files.find(
+              (file) => file.fieldname === imageField
+            );
 
-          // Upload the new image to Storage
-          const newImageRef = ref(storage, `partners/${partnerId}.jpg`);
-          await uploadBytesResumable(newImageRef, newImageFile.buffer, {
-            contentType: newImageFile.mimetype,
-          });
+            // Delete existing images (both .jpg and .png)
+            const existingImagesRef = ref(storage, "partners");
+            const existingImagesList = await listAll(existingImagesRef);
+
+            const deletePromises = existingImagesList.items.map(
+              async (item) => {
+                const imageName = item.name.replace(/\.[^/.]+$/, ""); // Remove file extension
+                if (imageName === partnerId) {
+                  await deleteObject(item);
+                }
+              }
+            );
+
+            await Promise.all(deletePromises);
+
+            // Upload the new image to Storage
+            const newImageRef = ref(storage, `partners/${partnerId}.jpg`);
+            await uploadBytesResumable(newImageRef, newImageFile.buffer, {
+              contentType: newImageFile.mimetype,
+            });
+          }
         }
       }
-    }
-
-    res.redirect("/admin/partners");
-  } catch (error) {
-    console.error("Error updating partner:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-app.post("/admin/partners/add", upload.any(), async (req, res) => {
-  try {
-    // Get the last id from the partners collection
-    const querySnapshot = await getDocs(
-      query(collection(db, "partners"), orderBy("__name__", "desc"), limit(1))
-    );
-
-    if (querySnapshot.docs.length > 0) {
-      const lastId = parseInt(querySnapshot.docs[0].id.replace("partner", ""));
-      console.log("Last ID:", lastId);
-
-      // Get data from the form
-      const { partner_name_, partner_website_ } = req.body;
-
-      // Image upload with id as name
-      const imageField = "partner_image_";
-      const newImageFile = req.files.find(
-        (file) => file.fieldname === imageField
-      );
-
-      if (!newImageFile) {
-        console.error("Error: File not found");
-        res.status(400).send("Bad Request: File not found");
-        return;
-      }
-
-      if (!newImageFile.buffer) {
-        console.error("Error: File buffer is undefined");
-        res.status(400).send("Bad Request: File buffer is undefined");
-        return;
-      }
-
-      console.log("File Buffer Size:", newImageFile.buffer.length);
-
-      const newImageRef = ref(storage, `partners/partner${lastId + 1}.jpg`);
-      await uploadBytesResumable(newImageRef, newImageFile.buffer, {
-        contentType: newImageFile.mimetype,
-      });
-
-      // Add data to the partners collection
-      await setDoc(doc(db, "partners", `partner${lastId + 1}`), {
-        name: partner_name_,
-        website: partner_website_,
-        id: lastId + 1,
-      });
 
       res.redirect("/admin/partners");
-    } else {
-      // Handle the case where there are no documents in the collection
-      console.error("Error: No documents found in the 'partners' collection");
-      res.status(404).send("No documents found in the 'partners' collection");
+    } catch (error) {
+      console.error("Error updating partner:", error);
+      res.status(500).send("Internal Server Error");
     }
-  } catch (error) {
-    console.error("Error adding partner:", error);
-    res.status(500).send("Internal Server Error");
   }
-});
+);
+
+app.post(
+  "/admin/partners/add",
+  checkAuthentication,
+  upload.any(),
+  async (req, res) => {
+    try {
+      // Get the last id from the partners collection
+      const querySnapshot = await getDocs(
+        query(collection(db, "partners"), orderBy("__name__", "desc"), limit(1))
+      );
+
+      if (querySnapshot.docs.length > 0) {
+        const lastId = parseInt(
+          querySnapshot.docs[0].id.replace("partner", "")
+        );
+        console.log("Last ID:", lastId);
+
+        // Get data from the form
+        const { partner_name_, partner_website_ } = req.body;
+
+        // Image upload with id as name
+        const imageField = "partner_image_";
+        const newImageFile = req.files.find(
+          (file) => file.fieldname === imageField
+        );
+
+        if (!newImageFile) {
+          console.error("Error: File not found");
+          res.status(400).send("Bad Request: File not found");
+          return;
+        }
+
+        if (!newImageFile.buffer) {
+          console.error("Error: File buffer is undefined");
+          res.status(400).send("Bad Request: File buffer is undefined");
+          return;
+        }
+
+        console.log("File Buffer Size:", newImageFile.buffer.length);
+
+        const newImageRef = ref(storage, `partners/partner${lastId + 1}.jpg`);
+        await uploadBytesResumable(newImageRef, newImageFile.buffer, {
+          contentType: newImageFile.mimetype,
+        });
+
+        // Add data to the partners collection
+        await setDoc(doc(db, "partners", `partner${lastId + 1}`), {
+          name: partner_name_,
+          website: partner_website_,
+          id: lastId + 1,
+        });
+
+        res.redirect("/admin/partners");
+      } else {
+        // Handle the case where there are no documents in the collection
+        console.error("Error: No documents found in the 'partners' collection");
+        res.status(404).send("No documents found in the 'partners' collection");
+      }
+    } catch (error) {
+      console.error("Error adding partner:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+);
 
 // Delete partners
 
 // Delete partners
-app.post("/admin/partners/delete", async (req, res) => {
+app.post("/admin/partners/delete", checkAuthentication, async (req, res) => {
   try {
     const partnerId = req.body.partner_id;
     console.log("Deleting partner:", partnerId);
@@ -613,11 +621,11 @@ app.post("/admin/partners/delete", async (req, res) => {
 
 // gallery delete selected images
 
-app.post("/admin/gallery/delete", async (req, res) => {
+app.post("/admin/gallery/delete", checkAuthentication, async (req, res) => {
   try {
     const selectedImages = req.body.delete || [];
 
-    // Dekete selected images by name
+    // Delete selected images by name
 
     const existingImagesRef = ref(storage, "images");
 
@@ -637,26 +645,31 @@ app.post("/admin/gallery/delete", async (req, res) => {
 
 // gallery upload images
 
-app.post("/admin/gallery/upload", upload.any(), async (req, res) => {
-  try {
-    // Upload all the images
-    const uploadPromises = req.files.map(async (file) => {
-      const imageRef = ref(storage, `images/${file.originalname}`);
-      await uploadBytesResumable(imageRef, file.buffer, {
-        contentType: file.mimetype,
+app.post(
+  "/admin/gallery/upload",
+  checkAuthentication,
+  upload.any(),
+  async (req, res) => {
+    try {
+      // Upload all the images
+      const uploadPromises = req.files.map(async (file) => {
+        const imageRef = ref(storage, `images/${file.originalname}`);
+        await uploadBytesResumable(imageRef, file.buffer, {
+          contentType: file.mimetype,
+        });
       });
-    });
 
-    await Promise.all(uploadPromises);
+      await Promise.all(uploadPromises);
 
-    res.redirect("/admin/gallery");
-  } catch (error) {
-    console.error("Error uploading images:", error);
-    res.status(500).send("Internal Server Error");
+      res.redirect("/admin/gallery");
+    } catch (error) {
+      console.error("Error uploading images:", error);
+      res.status(500).send("Internal Server Error");
+    }
   }
-});
+);
 
-app.post("/admin/prices/update", async (req, res) => {
+app.post("/admin/prices/update", checkAuthentication, async (req, res) => {
   try {
     const { services, prices } = req.body;
 
@@ -685,7 +698,32 @@ app.post("/admin/prices/update", async (req, res) => {
   }
 });
 
-// rules
+app.post("/admin/rules/update", checkAuthentication, async (req, res) => {
+  try {
+    const rules = req.body;
+
+    // Structure: { rule: [ 'a', 'b', 'c' ] }
+    const rulesArray = Object.values(rules)[0];
+
+    // Delete the entire document in the "rules" collection
+    await deleteDoc(doc(db, "texts", "rules"));
+
+    // Recreate the document and add new fields with the updated rules
+    const rulesRef = doc(db, "texts", "rules");
+    await setDoc(rulesRef, {});
+
+    for (let i = 0; i < rulesArray.length; i++) {
+      const field = i.toString();
+      await setDoc(rulesRef, { [field]: rulesArray[i] }, { merge: true });
+    }
+
+    console.log("Rules updated successfully");
+    res.status(200).redirect("/admin/rules");
+  } catch (error) {
+    console.error("Error updating rules:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
 
 // email handle
 

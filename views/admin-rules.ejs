@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-rules.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-global.css" />
   </head>
   <body>
     <form method="POST" action="/logout">
@@ -19,27 +20,35 @@
       <%- include('partials/admin-menu') %>
       <div class="content">
         <h1 class="main-heading">Rules</h1>
-        <form action="" class="rules-form">
-          <% Object.values(data.rules).forEach((rule) => { %>
-          <div class="rule-input-container">
+        <form action="/admin/rules/update" method="POST" class="rules-form">
+          <% Object.values(data.rules).forEach((rule, index) => { %>
+          <div class="current_rule" id="rule<%= index %>">
             <input type="text" name="rule" value="<%= rule %>" />
             <button
               type="button"
-              class="delete-rule"
-              onclick="deleteRule(this)"
+              class="delete-rule button1"
+              onclick="deleteRule('rule<%= index %>', 'delete-rule<%= index %>')"
             >
               Delete
             </button>
           </div>
           <% }) %>
-          <button type="button" class="add-rule" onclick="addRule()">
-            Add Rule
-          </button>
-          <button type="submit">Save changes</button>
         </form>
+        <div class="action_buttons">
+          <button class="button1" type="button" onclick="addRule()">
+            Add rule
+          </button>
+          <button class="button1" type="submit" onclick="submitForm()">
+            Save
+          </button>
+        </div>
       </div>
     </div>
-    <script src="/JS/adminServices.js"></script>
+    <script>
+      function submitForm() {
+        document.querySelector(".rules-form").submit();
+      }
+    </script>
     <script src="/JS/adminRules.js"></script>
   </body>
 </html>

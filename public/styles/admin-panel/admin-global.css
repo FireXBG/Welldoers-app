@@ -1,0 +1,17 @@
+.button1 {
+        border: solid 0.2rem black;
+        width: 20%;
+        background-color: black;
+        color: white;
+        padding: 0.5rem;
+        transition: 200ms;
+        margin-top: 1rem;
+        text-align: center;
+}
+
+.button1:hover {
+        background-color: white;
+        color: black;
+        border: solid 0.2rem black;
+}
+

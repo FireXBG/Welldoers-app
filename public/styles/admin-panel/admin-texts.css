@@ -51,17 +51,9 @@ label {
     gap: 1rem;
 }
 
-button {
-    margin-top: 1rem;
-    padding: 0.5rem;
-    border: solid 0.2rem #000;
-    background-color: #000;
-    color: #fff;
-    width: 20%;
-    transition: 200ms;
-}
-
-button:hover {
-    background-color: #fff;
-    color: #000;
+@media screen and (max-width: 1400px) {
+    .control-panel {
+        width: 70%;
+        margin-left: 30%;
+    }
 }

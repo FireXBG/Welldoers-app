@@ -1,24 +1,35 @@
-function addRule() {
-  const ruleContainer = document.querySelector(".rules-form");
-  const existingRules = ruleContainer.querySelectorAll('[name^="rule"]');
-  const newIndex = existingRules.length;
+document.addEventListener("DOMContentLoaded", function () {
+  const rulesForm = document.querySelector(".rules-form");
 
-  const newInput = document.createElement("div");
-  newInput.classList.add("rule-input-container");
-  newInput.innerHTML = `
-    <input type="text" name="rule_${newIndex}" placeholder="New Rule" />
-    <button type="button" class="delete-rule" onclick="deleteRule(this)">Delete</button>
-  `;
-  if (existingRules.length > 0) {
-    const lastAddRuleButton =
-      ruleContainer.lastElementChild.previousElementSibling;
-    ruleContainer.insertBefore(newInput, lastAddRuleButton);
-  } else {
-    ruleContainer.appendChild(newInput);
+  rulesForm.addEventListener("click", function (event) {
+    if (event.target.matches("button.add-rule")) {
+      addRule();
+    } else if (event.target.matches("button.delete-rule")) {
+      const rule = event.target.closest(".current_rule");
+      deleteRule(rule);
+    }
+  });
+});
+
+function deleteRule(rule) {
+  if (rule) {
+    rule.remove();
   }
 }
 
-function deleteRule(button) {
-  const ruleContainer = button.parentNode;
-  ruleContainer.parentNode.removeChild(ruleContainer);
+function addRule() {
+  const rulesForm = document.querySelector(".rules-form");
+  const rulesLength = document.querySelectorAll(".current_rule").length;
+
+  const html = `
+      <input type="text" name="rule"">
+      <button type="button" class="delete-rule">Delete</button>
+  `;
+
+  const newRule = document.createElement("div");
+  newRule.classList.add("current_rule");
+  newRule.setAttribute("id", `rule${rulesLength}`);
+  newRule.innerHTML = html;
+
+  rulesForm.appendChild(newRule);
 }

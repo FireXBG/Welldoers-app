@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-prices.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-global.css" />
   </head>
   <body>
     <form method="POST" action="/logout">
@@ -59,7 +60,7 @@
                 <td>
                   <button
                     type="button"
-                    class="delete-service"
+                    class="delete-service button1"
                     data-index="<%= index %>"
                   >
                     Delete
@@ -71,8 +72,10 @@
           </table>
 
           <!-- Save button -->
-          <button type="submit" class="save-btn">Save</button>
-          <button type="button" class="add-service">Add new service</button>
+          <button class="button1" type="submit" class="save-btn">Save</button>
+          <button class="button1" type="button" class="add-service">
+            Add new service
+          </button>
         </form>
       </div>
     </div>

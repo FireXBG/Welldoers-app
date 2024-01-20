@@ -7,14 +7,37 @@ h1 {
     margin-left: 20vw;
 }
 
-.rules-form {
+form {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 10px;
 }
 
-input {
-    width: 50%;
+.current_rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.current_rule input {
+    border-radius: 5px;
+    padding: 0.5rem;
+    border-radius: 0;
+    border: solid 0.2rem black;
+}
+
+.action_buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.delete-rule {
+    width: 100% !important;
+    margin-top: 0 !important;
 }
