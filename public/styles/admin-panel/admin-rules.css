@@ -1,0 +1,43 @@
+h1 {
+    margin: 2rem 0;
+    text-align: center;
+}
+
+.content {
+    margin-left: 20vw;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.current_rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.current_rule input {
+    border-radius: 5px;
+    padding: 0.5rem;
+    border-radius: 0;
+    border: solid 0.2rem black;
+}
+
+.action_buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+.delete-rule {
+    width: 100% !important;
+    margin-top: 0 !important;
+}

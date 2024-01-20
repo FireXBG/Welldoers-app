@@ -31,25 +31,27 @@ margin: 5rem;
     margin-top: 10rem;
 }
 
-.delete,
-.add {
-    border: solid 0.2rem black;
-    width: 20%;
-    background-color: black;
-    color: white;
-    padding: 0.5rem;
-    transition: 200ms;
+@media screen and (max-width: 1660px) {
+    .button1 {
+            width: 100% !important;
+        }
 }
 
-.delete:hover,
-.add:hover {
-    background-color: white;
-    color: black;
-    border: solid 0.2rem black;
+
+@media screen and (max-width: 1400px) {
+    .content {
+        width: 70vw;
+        margin-left: 30vw;
+    }
+
+    .gallery {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
-button:hover {
-    background-color: white;
-    color: black;
-    border: solid 0.2rem black;
+@media screen and (max-width: 1000px) {
+    .gallery {
+        grid-template-columns: 1fr;
+        place-items: center;
+    }
 }

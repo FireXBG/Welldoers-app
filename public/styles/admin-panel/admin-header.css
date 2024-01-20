@@ -54,3 +54,9 @@ nav {
 .nav-a img:first-child {
     margin-bottom: 0.3rem;
 }
+
+@media screen and (max-width: 1400px) {
+    header {
+        width: 30%;
+    }
+}

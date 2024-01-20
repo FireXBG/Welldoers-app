@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-gallery.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-global.css" />
   </head>
   <body>
     <form method="POST" action="/logout">
@@ -32,7 +33,11 @@
             </div>
             <% } %>
           </div>
-          <input type="submit" value="Delete selected images" class="delete" />
+          <input
+            type="submit"
+            value="Delete selected images"
+            class="delete button1"
+          />
         </form>
         <form
           class="add-form"
@@ -41,7 +46,7 @@
           enctype="multipart/form-data"
         >
           <input class="choose-file" type="file" name="image" />
-          <input type="submit" value="Add" class="add" />
+          <input type="submit" value="Add" class="add button1" />
         </form>
       </div>
     </div>

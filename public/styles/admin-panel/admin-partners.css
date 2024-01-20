@@ -61,18 +61,20 @@ input {
     margin-top: 2rem;
 }
 
-button {
-    border: solid 0.2rem black;
-    width: 20%;
-    background-color: black;
-    color: white;
-    padding: 0.5rem;
-    transition: 200ms;
-    margin-top: 1rem;
+@media screen and (max-width: 2120px) {
+    .partners-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
 }
 
-button:hover {
-    background-color: white;
-    color: black;
-    border: solid 0.2rem black;
+@media screen and (max-width: 1400px) {
+    .content {
+        width: 70%;
+        margin-left: 30%;
+    }
+
+    .partners-grid {
+        grid-template-columns: 1fr;
+    }
 }

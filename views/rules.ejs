@@ -18,12 +18,27 @@
     <link rel="stylesheet" href="/styles/loadingScreen.css" />
     <link rel="stylesheet" href="/styles/responsive/nav.css" />
     <link rel="stylesheet" href="/styles/responsive/footer.css" />
+    <link rel="stylesheet" href="/styles/rules.css" />
     <link rel="shortcut icon" href="/img/logo.png" />
     <title>Правила на парка - Welldoers</title>
   </head>
   <body>
     <%- include('partials/loading-screen') %> <%- include('partials/header') %>
     <img class="openButton" src="/img/menu.png" alt="open menu button" />
+
+    <section class="rules-section">
+      <h1>Правила на парка</h1>
+
+      <ul class="rules">
+        <ul class="rules">
+          <% Object.keys(data.rules).forEach((ruleId) => { %>
+          <li>
+            <h2><%= data.rules[ruleId] %></h2>
+          </li>
+          <% }); %>
+        </ul>
+      </ul>
+    </section>
 
     <%- include('partials/footer') %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>

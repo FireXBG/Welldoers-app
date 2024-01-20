@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/styles/admin-panel/admin.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-header.css" />
     <link rel="stylesheet" href="/styles/admin-panel/admin-partners.css" />
+    <link rel="stylesheet" href="/styles/admin-panel/admin-global.css" />
   </head>
   <body>
     <form method="POST" action="/logout">
@@ -60,7 +61,7 @@
                 name="partner_id"
                 value="<%= partner.name %>"
               />
-              <button type="submit">Save Changes</button>
+              <butto class="button1" type="submit">Save Changes</butto>
             </form>
             <form action="/admin/partners/delete" method="POST">
               <input
@@ -69,7 +70,7 @@
                 id="partner_id"
                 value="<%= partner.name %>"
               />
-              <button type="submit">Delete Partner</button>
+              <button class="button1" type="submit">Delete Partner</button>
             </form>
           </div>
           <% }); %>
@@ -87,7 +88,7 @@
           <input type="text" name="partner_website_" id="" />
           <label for="">Partner Image</label>
           <input type="file" name="partner_image_" id="" />
-          <button type="submit">Add Partner</button>
+          <button class="button1" type="submit">Add Partner</button>
         </form>
       </div>
     </div>
