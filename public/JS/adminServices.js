@@ -32,6 +32,7 @@ function createNewField() {
   const deleteButton = document.createElement("button");
   deleteButton.type = "button";
   deleteButton.className = "delete-service";
+  deleteButton.classList.add("button1");
   deleteButton.textContent = "Delete";
   deleteCell.appendChild(deleteButton);
   newRow.appendChild(deleteCell);

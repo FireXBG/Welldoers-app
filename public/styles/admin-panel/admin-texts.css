@@ -57,3 +57,31 @@ label {
         margin-left: 30%;
     }
 }
+
+@media screen and (max-width: 1000px) {
+    .control-panel {
+        width: 90% !important;
+        margin-left: 10% !important;
+    }
+
+    .content {
+        margin-right: 7% !important
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .control-panel {
+        width: 80% !important;
+        margin-left: 15% !important;
+        text-align: center;
+    }
+
+    form textarea {
+        text-align: center;
+    }
+
+    form {
+        align-items: center;
+        justify-content: center;
+    }
+}
