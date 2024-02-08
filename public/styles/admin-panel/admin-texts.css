@@ -85,3 +85,18 @@ label {
         justify-content: center;
     }
 }
+
+@media screen and (max-width: 500px) {
+    .control-panel {
+        width: 60% !important;
+        margin-left: 30% !important;
+    }
+
+    .page-container {
+        width: 100%;
+    }
+
+    .button1 {
+        width: 100% !important;
+    }
+}
