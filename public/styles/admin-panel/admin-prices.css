@@ -37,3 +37,37 @@ input {
     width: 100% !important;
     margin-top: 0 !important;
 }
+
+@media screen and (max-width: 620px) {
+    .content {
+        margin-left: 5rem !important;
+    }
+    td {
+        min-width: 5rem;
+        max-width: 5rem;
+    }
+
+    .button1 {
+        min-width: 5rem;
+    }
+
+    .save-btn,
+    .add-service {
+        width: 60% !important;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    .content {
+        margin-left: 3.5rem !important;
+    }
+    td {
+        min-width: 3rem;
+        max-width: 3rem;
+    }
+
+    .save-btn,
+    .add-service {
+        width: 50% !important;
+    }
+}

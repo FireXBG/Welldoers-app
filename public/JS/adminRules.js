@@ -23,7 +23,7 @@ function addRule() {
 
   const html = `
       <input type="text" name="rule"">
-      <button type="button" class="delete-rule">Delete</button>
+      <button type="button" class="delete-rule button1">Delete</button>
   `;
 
   const newRule = document.createElement("div");

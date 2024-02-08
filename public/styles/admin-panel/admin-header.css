@@ -60,3 +60,18 @@ nav {
         width: 30%;
     }
 }
+
+@media screen and (max-width: 1000px) {
+    header {
+        width: 5rem;
+    }
+
+    h2 {
+        display: none;
+    }
+    
+    .nav-a {
+        justify-content: center;
+        padding-left: 0;
+    }
+}   
