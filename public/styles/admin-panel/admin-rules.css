@@ -41,3 +41,23 @@ form {
     width: 100% !important;
     margin-top: 0 !important;
 }
+
+@media screen and (max-width: 400px) {
+    .content {
+        margin-left: 5rem !important;
+    }
+
+    .current_rule {
+        flex-direction: column;
+    }
+
+    .add,
+    .save {
+        width: 50% !important;
+    }
+
+    .action_buttons {
+        flex-direction: column;
+        width: 100% !important;
+    }
+}
