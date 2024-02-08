@@ -5,7 +5,7 @@ const multer = require("multer");
 const sendEmail = require("./public/JS/sendEmail");
 
 const app = express();
-const port = 443;
+const port = 3000;
 
 const upload = multer();
 
@@ -71,10 +71,8 @@ async function checkAuthentication(req, res, next) {
     });
 
     if (user) {
-      console.log("Authenticated user.");
       next(); // Continue to the next middleware or route
     } else {
-      console.log("User is signed out");
       res.redirect("/login"); // Redirect to the login page
     }
   } catch (error) {
