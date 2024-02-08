@@ -69,14 +69,21 @@ input {
 }
 
 @media screen and (max-width: 1400px) {
-    .content {
-        width: 70%;
-        margin-left: 30%;
-    }
 
     .partners-grid {
         grid-template-columns: 1fr;
     }
+}
+
+@media screen and (max-width: 1245px) {
+    .add-partner-form {
+        margin: 2rem;
+        padding: 1rem;
+    }
+
+        .add-partner-form input {
+            width: 80%;
+        }
 }
 
 @media screen and (max-width: 1000px) {
@@ -88,6 +95,10 @@ input {
 @media screen and (max-width: 450px) {
     .content {
         width: 100% !important;
-        margin-left: 10% !important;
+        margin-left: 5rem !important;
+    }
+
+    .partners-grid {
+        padding: 1rem;
     }
 }
